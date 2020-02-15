@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+#nullable enable
+
 namespace YugiohCardDatabase
 {
     public class Option<T> : IEquatable<Option<T>>
@@ -11,7 +13,7 @@ namespace YugiohCardDatabase
 
         internal Option(bool isValid, T item)
         {
-            if (item == null)
+            if (isValid && item == null)
             {
                 throw new ArgumentNullException(nameof(item));
             }
@@ -31,6 +33,11 @@ namespace YugiohCardDatabase
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <returns></returns>
         public T Unwrap()
         {
             if (this.isValid)
@@ -43,24 +50,40 @@ namespace YugiohCardDatabase
             }
         }
 
+        public T UnwrapOr(T defaultValue)
+        {
+            if (this.isValid)
+            {
+                return this.item;
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
         public bool Equals(Option<T> other)
         {
-            return this.isValid.Equals(other.isValid) && this.item.Equals(other.item);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Option<T> other && this.Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return this.isValid.GetHashCode() ^ this.item.GetHashCode();
+            if (this.isValid && other.isValid)
+            {
+                return this.item?.Equals(other.item) ?? other.item == null;
+            }
+            else
+            {
+                return this.isValid == other.isValid;
+            }
         }
     }
 
     public static class Option
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns></returns>
         public static Option<T> Some<T>(T item)
         {
             if (item == null)
@@ -85,6 +108,18 @@ namespace YugiohCardDatabase
             else
             {
                 return Some(item.Value);
+            }
+        }
+
+        public static Option<T> FromNullableClass<T>(T? item) where T : class
+        {
+            if (item == null)
+            {
+                return None<T>();
+            }
+            else
+            {
+                return Some(item);
             }
         }
     }
