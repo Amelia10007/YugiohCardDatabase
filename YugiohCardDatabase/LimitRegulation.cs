@@ -38,13 +38,13 @@ namespace YugiohCardDatabase
 
         public override string ToString()
         {
-            switch (this.MaxAdoptableCount)
+            return this.MaxAdoptableCount switch
             {
-                case 0: return "禁止";
-                case 1: return "制限";
-                case 2: return "準制限";
-                default: return "";
-            }
+                0 => "禁止",
+                1 => "制限",
+                2 => "準制限",
+                _ => "",
+            };
         }
 
         public string ConvertToJson() => JsonSerializer.Serialize(this);
