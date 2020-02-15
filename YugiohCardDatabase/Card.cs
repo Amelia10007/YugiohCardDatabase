@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
+#nullable enable
 
 namespace YugiohCardDatabase
 {
@@ -43,9 +46,9 @@ namespace YugiohCardDatabase
         [JsonIgnore]
         public IEnumerable<CardKind> Kinds => this.kinds;
         [JsonIgnore]
-        public Option<MonsterRace> Race => Option.FromNullableStruct(this.race);
+        public Option<MonsterRace> Race => Option.FromNullableClass(this.race);
         [JsonIgnore]
-        public Option<MonsterAttribute> Attribute => Option.FromNullableStruct(this.attribute);
+        public Option<MonsterAttribute> Attribute => Option.FromNullableClass(this.attribute);
         [JsonIgnore]
         public Option<MonsterLevel> Level => Option.FromNullableStruct(this.level);
         [JsonIgnore]
@@ -55,9 +58,9 @@ namespace YugiohCardDatabase
         [JsonIgnore]
         public Option<MonsterLink> Link => Option.FromNullableStruct(this.link);
         [JsonIgnore]
-        public Option<MonsterAttack> Attack => Option.FromNullableStruct(this.attack);
+        public Option<MonsterAttack> Attack => Option.FromNullableClass(this.attack);
         [JsonIgnore]
-        public Option<MonsterDefence> Defence => Option.FromNullableStruct(this.defence);
+        public Option<MonsterDefence> Defence => Option.FromNullableClass(this.defence);
 
         public Card(string name,
             string pronunciation,
@@ -86,14 +89,43 @@ namespace YugiohCardDatabase
             this.defence = defence;
         }
 
-        public string ConstructFormattedDescripton()
+        /// <summary>
+        /// カードの効果テキスト以外の情報 (カード名，種別，モンスターのレベルなど)を，視覚的に見やすいフォーマットで返す．
+        /// </summary>
+        /// <returns></returns>
+        public string ConstructFormattedInfoWithoutDescription()
         {
-            throw new NotImplementedException();
+            StringBuilder builder = new StringBuilder();
+            builder.Append(this.name);
+            builder.Append($" ({this.pronunciation}");
+            foreach (var kind in this.Kinds)
+            {
+                builder.Append(" / " + kind);
+            }
+            this.Attribute.MayAct(attribute => builder.Append(" / " + attribute));
+            this.Race.MayAct(race => builder.Append(" / " + race));
+            this.Level.MayAct(level => builder.Append(" / " + level));
+            this.Rank.MayAct(rank => builder.Append(" / " + rank));
+            this.PendulumScale.MayAct(scale => builder.Append(" / " + scale));
+            this.Link.MayAct(link => builder.Append(" / " + link));
+            this.Attack.MayAct(attack => builder.Append(" / " + attack));
+            this.Defence.MayAct(defence => builder.Append(" / " + defence));
+
+            return builder.ToString();
         }
 
         public bool Equals(Card other) => this.IdentityShortName.Equals(other.IdentityShortName);
 
-        public int CompareTo(Card other) => this.IdentityShortName.CompareTo(other.IdentityShortName);
+        public int CompareTo(Card other)
+        {
+            // まずはカード種別に順序付けを試みる．
+            var maxKind = this.Kinds.Max();
+            var otherMaxKind = other.Kinds.Max();
+            var kindComparison = maxKind.CompareTo(otherMaxKind);
+            if (kindComparison != 0) return kindComparison;
+            // カード種別が同一なら，カード名で順序付けする．
+            return this.name.CompareTo(other.name);
+        }
 
         public override bool Equals(object obj) => obj is Card c && this.Equals(c);
 
@@ -103,6 +135,8 @@ namespace YugiohCardDatabase
 
         public string ConvertToJson()
         {
+            // nullなフィールドは記録の必要がない情報なので，Jsonには残さない．
+            // 例えば，魔法カードなら`attack`フィールドはnullになるが，魔法カードの情報を保存する場合には`attack`フィールドの情報は必要ない．
             var serializerOptions = new JsonSerializerOptions()
             {
                 IgnoreNullValues = true,
