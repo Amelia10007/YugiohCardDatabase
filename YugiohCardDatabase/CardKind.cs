@@ -36,6 +36,33 @@ namespace YugiohCardDatabase
         public static readonly CardKind ContinuousTrap = new CardKind("永続罠");
         public static readonly CardKind CounterTrap = new CardKind("カウンター罠");
 
+        public static readonly CardKind[] CardKinds = new[]
+        {
+            NormalMonster,
+            EffectMonster,
+            DualMonster,
+            SpiritMonster,
+            TunarMonster,
+            ReverseMonster,
+            ToonMonster,
+            SpecialSummonMonster,
+            RitualMonster,
+            FusionMonster,
+            SynchroMonster,
+            XyzMonster,
+            PendulumMonster,
+            LinkMonster,
+            NormalSpell,
+            RitualSpell,
+            EquipSpell,
+            FieldSpell,
+            ContinuousSpell,
+            QuickSpell,
+            NormalTrap,
+            ContinuousTrap,
+            CounterTrap,
+        };
+
         private static readonly CardKind[] monsterCardKinds = new[]
         {
             NormalMonster,
