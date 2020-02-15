@@ -36,6 +36,17 @@ namespace YugiohCardDatabase
             this.MaxAdoptableCount = maxAdoptableCount;
         }
 
+        public override string ToString()
+        {
+            switch (this.MaxAdoptableCount)
+            {
+                case 0: return "禁止";
+                case 1: return "制限";
+                case 2: return "準制限";
+                default: return "";
+            }
+        }
+
         public string ConvertToJson() => JsonSerializer.Serialize(this);
 
         /// <summary>
