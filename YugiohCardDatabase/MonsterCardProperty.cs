@@ -90,6 +90,25 @@ namespace YugiohCardDatabase
         public readonly bool Left;
         public readonly bool UpperLeft;
 
+        [JsonIgnore]
+        public int LinkCount
+        {
+            get
+            {
+                var count = 0;
+                if (this.Up) count++;
+                if (this.UpperRight) count++;
+                if (this.Right) count++;
+                if (this.LowerRight) count++;
+                if (this.Low) count++;
+                if (this.LowerLeft) count++;
+                if (this.Left) count++;
+                if (this.UpperLeft) count++;
+
+                return count;
+            }
+        }
+
         public MonsterLink(bool up, bool upperRight, bool right, bool lowerRight, bool low, bool lowerLeft, bool left, bool upperLeft)
         {
             this.Up = up;
