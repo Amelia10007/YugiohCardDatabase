@@ -62,6 +62,14 @@ namespace YugiohCardDatabase
             }
         }
 
+        public void MayAct(Action<T> action)
+        {
+            if (this.isValid)
+            {
+                action(this.item);
+            }
+        }
+
         public bool Equals(Option<T> other)
         {
             if (this.isValid && other.isValid)
