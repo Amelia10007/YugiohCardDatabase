@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Linq;
 
+#nullable enable
+
 namespace YugiohCardDatabase
 {
     /// <summary>
