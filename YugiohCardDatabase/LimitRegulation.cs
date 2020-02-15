@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 
 #nullable enable
 
@@ -7,7 +8,7 @@ namespace YugiohCardDatabase
     /// <summary>
     /// リミットレギュレーション (各カードのデッキ投入枚数の規定)を表す．
     /// </summary>
-    public readonly struct LimitRegulation
+    public readonly struct LimitRegulation : IEquatable<LimitRegulation>
     {
         /// <summary>
         /// 禁止カード．デッキに1枚も投入できない．
@@ -35,6 +36,8 @@ namespace YugiohCardDatabase
         {
             this.MaxAdoptableCount = maxAdoptableCount;
         }
+
+        public bool Equals(LimitRegulation other) => this.MaxAdoptableCount.Equals(other.MaxAdoptableCount);
 
         public override string ToString()
         {
