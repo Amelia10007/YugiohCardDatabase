@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 
+#nullable enable
+
 namespace YugiohCardDatabase
 {
     /// <summary>
@@ -43,10 +45,5 @@ namespace YugiohCardDatabase
         /// <exception cref="JsonException"></exception>
         /// <returns></returns>
         public static LimitRegulation ConstructFromJson(string json) => JsonSerializer.Deserialize<LimitRegulation>(json);
-    }
-
-    public interface ILimitRegulationDatabase
-    {
-        LimitRegulation SearchLimitRegulationOf(string cardName);
     }
 }
