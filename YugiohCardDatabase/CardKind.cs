@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using System.Linq;
+using System.Runtime.Serialization;
 
 #nullable enable
 
@@ -10,6 +10,7 @@ namespace YugiohCardDatabase
     /// <summary>
     /// カードの分類を表す．
     /// </summary>
+    [DataContract]
     public class CardKind : IEquatable<CardKind>, IComparable<CardKind>
     {
         public static readonly CardKind NormalMonster = new CardKind("通常");
@@ -130,27 +131,28 @@ namespace YugiohCardDatabase
             { CounterTrap, 230 },
         };
 
+        [DataMember]
         private readonly string kind;
 
         /// <summary>
         /// この分類のカードがモンスターカードに属しているか取得する．
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         public bool IsMonster => monsterCardKinds.Any(k => k.kind == this.kind);
         /// <summary>
         /// この分類のカードがエクストラデッキに入るカードか取得する．
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         public bool IsExtra => extraDeckCardKinds.Any(k => k.kind == this.kind);
         /// <summary>
         /// この分類のカードが魔法カードか取得する．
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         public bool IsSpell => spellCardKinds.Any(k => k.kind == this.kind);
         /// <summary>
         /// この分類のカードが罠カードか取得する．
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         public bool IsTrap => trapCardKinds.Any(k => k.kind == this.kind);
 
         private CardKind(string kind) => this.kind = kind;

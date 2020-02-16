@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 
 #nullable enable
 
@@ -8,6 +10,7 @@ namespace YugiohCardDatabase
     /// <summary>
     /// リミットレギュレーション (各カードのデッキ投入枚数の規定)を表す．
     /// </summary>
+    [DataContract]
     public readonly struct LimitRegulation : IEquatable<LimitRegulation>
     {
         /// <summary>
@@ -30,9 +33,10 @@ namespace YugiohCardDatabase
         /// <summary>
         /// デッキに投入可能な最大枚数．
         /// </summary>
+        [DataMember]
         public readonly int MaxAdoptableCount;
 
-        private LimitRegulation(int maxAdoptableCount)
+        internal LimitRegulation(int maxAdoptableCount)
         {
             this.MaxAdoptableCount = maxAdoptableCount;
         }
@@ -49,15 +53,50 @@ namespace YugiohCardDatabase
                 _ => "",
             };
         }
+    }
 
-        public string ConvertToJson() => JsonSerializer.Serialize(this);
+    [DataContract]
+    public class LimitRegulationDatabase
+    {
+        [DataMember]
+        private readonly Dictionary<int, List<string>> regulations = new Dictionary<int, List<string>>();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="json"></param>
-        /// <exception cref="JsonException"></exception>
-        /// <returns></returns>
-        public static LimitRegulation ConstructFromJson(string json) => JsonSerializer.Deserialize<LimitRegulation>(json);
+        [IgnoreDataMember]
+        private Dictionary<string, LimitRegulation>? regulationsForSearch;
+
+        public void AddLimitRegulation(string cardName, LimitRegulation limitRegulation)
+        {
+            if (this.regulationsForSearch == null) this.regulationsForSearch = new Dictionary<string, LimitRegulation>();
+            if (!this.regulations.ContainsKey(limitRegulation.MaxAdoptableCount))
+            {
+                this.regulations.Add(limitRegulation.MaxAdoptableCount, new List<string>());
+            }
+            this.regulations[limitRegulation.MaxAdoptableCount].Add(cardName);
+            this.regulationsForSearch.Add(cardName, limitRegulation);
+        }
+
+        public LimitRegulation GetLimitRegulationOf(string cardName)
+        {
+            if (this.regulationsForSearch == null) this.regulationsForSearch = new Dictionary<string, LimitRegulation>();
+            if (!this.regulationsForSearch.Any())
+            {
+                foreach (var item in this.regulations)
+                {
+                    var regulation = item.Key;
+                    foreach (var name in item.Value)
+                    {
+                        this.regulationsForSearch.Add(name, new LimitRegulation(regulation));
+                    }
+                }
+            }
+            if (this.regulationsForSearch.ContainsKey(cardName))
+            {
+                return this.regulationsForSearch[cardName];
+            }
+            else
+            {
+                return LimitRegulation.Unlimited;
+            }
+        }
     }
 }
