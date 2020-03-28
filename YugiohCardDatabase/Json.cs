@@ -36,7 +36,7 @@ namespace YugiohCardDatabase
                 stream: stream,
                 encoding: encoding,
                 ownsStream: true,
-                indent: false,
+                indent: true,
                 indentChars: " "))
             {
                 serializer.WriteObject(writer, source);
